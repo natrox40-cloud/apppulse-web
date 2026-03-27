@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 
-const API = "https://apppulse-api.vercel.app";
+const API = "https://apppulse-api-production.up.railway.app";
 
 function AppPulse() {
   const [page, setPage] = useState("landing");
