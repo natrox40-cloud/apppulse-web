@@ -15,8 +15,8 @@ const N = (id) => NAMES[id] || id.split(".").slice(-1)[0];
 // ============================================================
 const LANGS = {
   ko: {
-    tagline: "매주 월요일, 리포트가 도착합니다",
-    sub: "앱 운영을 위한 AI 건강 분석 리포트",
+    tagline: "매주 월요일, 이 리포트가 도착합니다",
+    sub: "앱 운영팀을 위한 AI 건강 분석 리포트",
     start: "무료로 시작",
     cta: "내 앱 등록하기",
     ctaSub: "매주 이 리포트를 자동으로 받아보세요. 앱 ID만 등록하면 다음 월요일부터 시작됩니다.",
@@ -395,7 +395,7 @@ export default function AppPulse(){
  
   const predict=async()=>{
     if(!sel)return;setPredicting(true);
-    try{const r=await fetch(`${API}/apps/${sel}/predict`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({generate_report:true})});const d=await r.json();if(d)setReport(d);}catch(e){}
+    try{const r=await fetch(`${API}/apps/${sel}/predict`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({generate_report:true,language:lang})});const d=await r.json();if(d)setReport(d);}catch(e){}
     setPredicting(false);
   };
  
@@ -452,7 +452,7 @@ export default function AppPulse(){
     app:N(sel),level:report.risk_level,drop:report.drop_probability,rise:report.rise_probability,
     health:report.health_score,briefing:report.briefing_text,
     rptNo:`RPT-${report.report_date?.replace(/-/g,"")}`,period:`${report.period_start} — ${report.period_end}`,gen:report.created_at||"—",
-    factors:report.report_json?.top_factors?.map(f=>({n:f.name,p:Math.round(Math.random()*30+5),c:"#636e72",tag:f.category,tb:"#f1efe8",tc:"#5f5e5a",detail:`현재값: ${f.current_value}, 변화: ${f.change||"—"}`}))||[],
+    factors:report.report_json?.top_factors?.map((f,i)=>{const cm={"추세":{c:"#6C5CE7",tb:"#EEEDFE",tc:"#3C3489"},"패치":{c:"#E17055",tb:"#FAEEDA",tc:"#633806"},"건강":{c:"#00B894",tb:"#E1F5EE",tc:"#085041"},"기본":{c:"#636e72",tb:"#F1EFE8",tc:"#5F5E5A"},"Trend":{c:"#6C5CE7",tb:"#EEEDFE",tc:"#3C3489"},"Patch":{c:"#E17055",tb:"#FAEEDA",tc:"#633806"},"Health":{c:"#00B894",tb:"#E1F5EE",tc:"#085041"},"Basic":{c:"#636e72",tb:"#F1EFE8",tc:"#5F5E5A"}};const cl=cm[f.category]||cm["기본"];return{n:f.name,p:Math.round(40/(i+1)),c:cl.c,tag:f.category,tb:cl.tb,tc:cl.tc,detail:`현재값: ${f.current_value}, 변화: ${f.change||"—"}`}})||[],
     comp:[],reviews:[],retro:{pred:45,actual:-0.05,match:true},stats:{vars:61,sims:200,lift:2.05},
     rating7d:report.report_json?.current_metrics?.rating_7d,
     negRatio:report.report_json?.current_metrics?.neg_ratio_7d?(report.report_json.current_metrics.neg_ratio_7d*100).toFixed(1):undefined,
